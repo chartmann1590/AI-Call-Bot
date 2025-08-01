@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow">
+    <div class="max-w-3xl mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <!-- Back to Home Link -->
+        <a href="{{ url_for('index') }}" class="text-xl font-bold text-gray-800 hover:text-blue-600">
+          🗨️ Conversations
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow flex items-center justify-center">
+    <div class="bg-white max-w-xl w-full p-6 rounded-lg shadow-md mt-8 mb-8">
+      <h1 class="text-2xl font-semibold mb-6 text-gray-800">⚙️ Application Settings</h1>
+      <form method="post" class="space-y-6">
+        <!-- Ollama Server URL -->
+        <div>
+          <label for="ollama_url" class="block text-gray-700 font-medium mb-1">
+            Ollama Server URL
+          </label>
+          <input
+            type="text"
+            name="ollama_url"
+            id="ollama_url"
+            value="{{ ollama_url }}"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="e.g. http://127.0.0.1:11434"
+            required
+          />
+        </div>
+
+        <!-- Ollama Model Select -->
+        <div>
+          <label for="ollama_model" class="block text-gray-700 font-medium mb-1">
+            Select Ollama Model
+          </label>
+          <select
+            name="ollama_model"
+            id="ollama_model"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          >
+            {% if model_names %}
+              {% for model in model_names %}
+                <option value="{{ model }}" {% if model == current_model %}selected{% endif %}>
+                  {{ model }}
+                </option>
+              {% endfor %}
+            {% else %}
+              <option disabled>No models found at {{ ollama_url }}</option>
+            {% endif %}
+          </select>
+        </div>
+
+        <!-- TTS Voice Select (with Preview button) -->
+        <div>
+          <label for="tts_voice" class="block text-gray-700 font-medium mb-1">
+            Select TTS Voice
+          </label>
+          <div class="flex items-center space-x-2">
+            <select
+              name="tts_voice"
+              id="tts_voice"
+              class="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            >
+              {% for label, code in voices %}
+                <option value="{{ code }}" {% if code == current_voice %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+            <button
+              type="button"
+              id="previewBtn"
+              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              ▶ Preview
+            </button>
+          </div>
+          <!-- Hidden audio element, will be populated by JavaScript -->
+          <audio id="previewAudio" class="mt-2 w-full" controls style="display: none;"></audio>
+        </div>
+
+        <!-- Persona Select -->
+        <div>
+          <label for="persona_key" class="block text-gray-700 font-medium mb-1">
+            Select Persona
+          </label>
+          <select
+            name="persona_key"
+            id="persona_key"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          >
+            {% for key, label in personas %}
+              <option value="{{ key }}" {% if key == current_persona %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            💾 Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript to handle voice preview -->
+  <script>
+    document.getElementById('previewBtn').addEventListener('click', async () => {
+      const select = document.getElementById('tts_voice');
+      const selectedVoice = select.value;
+      const audioElem = document.getElementById('previewAudio');
+
+      // Fetch the MP3 from /preview_tts?voice=<selectedVoice>
+      try {
+        const response = await fetch(`/preview_tts?voice=${encodeURIComponent(selectedVoice)}`, {
+          method: 'GET'
+        });
+        if (!response.ok) {
+          throw new Error('Failed to generate preview');
+        }
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        audioElem.src = url;
+        audioElem.style.display = 'block';
+        audioElem.play();
+      } catch (err) {
+        console.error('Voice preview error:', err);
+        alert('Could not generate voice preview.');
+      }
+    });
+  </script>
+</body>
+</html>

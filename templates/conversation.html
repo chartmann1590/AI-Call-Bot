@@ -1,0 +1,55 @@
+<!-- templates/conversation.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conversation {{ conversation_id }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-3xl mx-auto p-4">
+    <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline mb-6 inline-block">← Back to all conversations</a>
+    <h1 class="text-3xl font-bold mb-2">Conversation #{{ conversation_id }}</h1>
+    <p class="text-gray-600 mb-4">Started at {{ start_time }}</p>
+
+    {% if full_summary %}
+      <div class="mb-6 bg-gray-100 p-4 rounded-lg shadow-inner">
+        <h2 class="text-xl font-semibold mb-2">Conversation Summary</h2>
+        <p class="text-gray-800 whitespace-pre-wrap">{{ full_summary }}</p>
+      </div>
+    {% endif %}
+
+    <div class="mb-6 bg-white p-4 rounded-lg shadow">
+      <p><span class="font-semibold">LLM Model:</span> {{ llm_model }}</p>
+      <p><span class="font-semibold">TTS Voice:</span> {{ tts_voice }}</p>
+    </div>
+
+    {% for date, msgs in grouped.items() %}
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">{{ date }}</h2>
+        <div class="space-y-4">
+          {% for m in msgs %}
+            {% if m.sender == 'user' %}
+              <div class="flex justify-end">
+                <div class="max-w-lg px-4 py-2 bg-blue-500 text-white rounded-lg rounded-br-none">
+                  <p class="whitespace-pre-wrap">{{ m.text }}</p>
+                  <span class="block text-xs text-blue-200 text-right mt-1">{{ m.time }}</span>
+                </div>
+              </div>
+            {% else %}
+              <div class="flex justify-start">
+                <div class="max-w-lg px-4 py-2 bg-gray-200 text-gray-900 rounded-lg rounded-bl-none">
+                  <p class="whitespace-pre-wrap">{{ m.text }}</p>
+                  <span class="block text-xs text-gray-500 mt-1">{{ m.time }}</span>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

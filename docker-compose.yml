@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  ai-call-bot:
+    build: .
+    container_name: ai-call-bot
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_HOST=0.0.0.0
+      - FLASK_PORT=5000
+      - FLASK_DEBUG=False
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3.2
+      - TTS_VOICE=en-US-JennyNeural
+      - CURRENT_PERSONA_KEY=helpful
+      - DATABASE_PATH=/app/data/conversations.db
+    volumes:
+      - ./data:/app/data
+      - ./templates:/app/templates
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json:ro
+    networks:
+      - ai-call-bot-network
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    devices:
+      - /dev/snd:/dev/snd  # Audio devices (Linux only)
+    group_add:
+      - audio  # Audio group access
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ai-call-bot-network
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  ai-call-bot-network:
+    driver: bridge 
