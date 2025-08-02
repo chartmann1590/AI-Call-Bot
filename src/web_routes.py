@@ -20,7 +20,9 @@ import os
 
 def create_app():
     """Create and configure the Flask application."""
-    app = Flask(__name__)
+    # Set the template folder to the parent directory's templates folder
+    template_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'templates')
+    app = Flask(__name__, template_folder=template_dir)
     
     # Register database close function
     app.teardown_appcontext(close_db)

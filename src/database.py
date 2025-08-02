@@ -24,7 +24,9 @@ def close_db(e=None):
 
 def init_db():
     """Initialize database with required tables."""
-    db = get_db()
+    # Create a direct database connection for initialization
+    db = sqlite3.connect(DATABASE_PATH)
+    db.row_factory = sqlite3.Row
     
     # Create conversations table
     db.execute("""
@@ -63,6 +65,7 @@ def init_db():
         pass  # Column already exists
     
     db.commit()
+    db.close()
 
 def start_new_conversation() -> int:
     """Start a new conversation and return its ID."""
