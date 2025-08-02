@@ -20,6 +20,10 @@ from flask import Flask, render_template, g, request, jsonify, send_file
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Phase 1 Upgrade Imports
+from security import security_manager, init_security_db, log_audit_event
+from monitoring import monitoring_manager
+
 # ——————————— CONFIGURATION ———————————
 
 # 1. Audio params (VAD)
@@ -926,15 +930,24 @@ def preview_tts():
 if __name__ == "__main__":
     # 1) Initialize DB (create tables if needed; add columns if missing)
     init_db()
+    
+    # 2) Initialize Phase 1 upgrade systems
+    print("[INFO] Initializing security system...")
+    init_security_db()
+    print("[INFO] Security system initialized.")
+    
+    print("[INFO] Initializing monitoring system...")
+    monitoring_manager._init_monitoring_db()
+    print("[INFO] Monitoring system initialized.")
 
-    # 2) Initialize Whisper once
+    # 3) Initialize Whisper once
     print("[INFO] Loading Whisper model (base)…")
     whisper_model = WhisperModel("base", device="cpu")
     print("[INFO] Whisper model loaded.")
 
-    # 3) Start the background thread running main_loop()
+    # 4) Start the background thread running main_loop()
     t = threading.Thread(target=main_loop, daemon=True)
     t.start()
 
-    # 4) Launch Flask (serving at http://0.0.0.0:5000/)
+    # 5) Launch Flask (serving at http://0.0.0.0:5000/)
     app.run(host="0.0.0.0", port=5000)

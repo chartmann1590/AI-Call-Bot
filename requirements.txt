@@ -12,4 +12,16 @@ google-auth==2.23.4
 google-auth-oauthlib==1.1.0
 google-auth-httplib2==0.1.1
 google-api-python-client==2.108.0
-python-dotenv==1.0.0 
+python-dotenv==1.0.0
+
+# Security enhancements (Phase 1)
+PyJWT==2.8.0
+bcrypt==4.1.2
+cryptography==41.0.7
+
+# Monitoring and logging (Phase 1)
+psutil==5.9.6
+
+# API and serialization (Phase 1)
+flask-restful==0.3.10
+flask-cors==4.0.0 
