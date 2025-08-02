@@ -15,6 +15,9 @@ AI Call Bot/
 │   ├── 🎤 audio_processor.py       # Audio recording and processing
 │   ├── 💬 conversation_manager.py   # Main conversation orchestration
 │   ├── 🌐 web_routes.py            # Flask web routes and API
+│   ├── 🔒 security.py              # Security and authentication (Phase 1)
+│   ├── 📊 monitoring.py            # System monitoring and metrics (Phase 1)
+│   ├── 🔌 api_routes.py            # RESTful API endpoints (Phase 1)
 │   ├── 🚀 start.py                 # Flexible startup script
 │   ├── 🧪 test_setup.py            # Setup verification script
 │   ├── 📱 app.py                   # Original monolithic app (legacy)
@@ -97,6 +100,31 @@ make install
 
 # Run tests
 make test
+```
+
+## 🔒 Phase 1 Security & Monitoring Features
+
+### Security Module (`src/security.py`)
+- **JWT Authentication**: Secure token-based user authentication
+- **Password Hashing**: Bcrypt-based password security
+- **Data Encryption**: Fernet encryption for sensitive data
+- **Input Sanitization**: Protection against injection attacks
+- **Audit Logging**: Complete action tracking and logging
+- **Rate Limiting**: Protection against API abuse
+
+### Monitoring Module (`src/monitoring.py`)
+- **System Metrics**: Real-time CPU, memory, disk, and network monitoring
+- **Conversation Metrics**: Active conversations, duration, message counts
+- **AI Performance**: LLM response times and success rates
+- **Error Tracking**: Centralized error logging and reporting
+- **Health Checks**: System health status monitoring
+
+### API Routes Module (`src/api_routes.py`)
+- **RESTful Endpoints**: Comprehensive API for external integrations
+- **CORS Support**: Cross-origin resource sharing
+- **Authentication**: Secure API access with JWT tokens
+- **Metrics Exposure**: System performance data via API
+- **Health Checks**: API-based system health monitoring
 
 # Development mode
 make run-debug
