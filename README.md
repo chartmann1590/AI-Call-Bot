@@ -105,6 +105,74 @@ AI Call Bot/
 - **Docker & Docker Compose** (optional, for containerized deployment)
 - **Audio hardware** (microphone and speakers)
 
+## 🔊 Audio System Requirements
+
+### **Critical Audio Routing Setup**
+
+The AI Call Bot requires proper audio routing to function correctly. The system uses your **default system audio devices** for both input and output.
+
+#### **Required Audio Configuration:**
+
+1. **🎤 Microphone (Input)**:
+   - Must be set as your **default system input device**
+   - The system automatically uses the default microphone
+   - Test your microphone: `python src/test_setup.py`
+
+2. **🔊 Speakers/Headphones (Output)**:
+   - Must be set as your **default system output device**
+   - TTS audio will play through the default speakers
+   - Ensure speakers are not muted and volume is adequate
+
+#### **Audio Processing Flow:**
+
+```
+🎤 Microphone → 🔊 Audio Detection → 📝 Transcription → 🤖 LLM Response → 🔊 TTS → 🔊 Speakers
+```
+
+#### **System Audio Settings:**
+
+**Windows:**
+- Right-click speaker icon → "Open Sound settings"
+- Set default input device (microphone)
+- Set default output device (speakers/headphones)
+- Test both devices in sound settings
+
+**macOS:**
+- System Preferences → Sound
+- Set input device (microphone)
+- Set output device (speakers/headphones)
+- Test both devices
+
+**Linux:**
+- Use `pavucontrol` or system sound settings
+- Set default input and output devices
+- Ensure proper permissions for audio access
+
+#### **Troubleshooting Audio Issues:**
+
+1. **No Speech Detection:**
+   - Check microphone permissions
+   - Verify microphone is default input device
+   - Test microphone in system settings
+   - Run: `python src/test_setup.py`
+
+2. **No TTS Audio:**
+   - Check speaker volume and mute status
+   - Verify speakers are default output device
+   - Test speakers in system settings
+   - Check audio drivers
+
+3. **Audio Quality Issues:**
+   - Ensure 16kHz sample rate support
+   - Check for background noise
+   - Verify microphone quality
+   - Test with different audio devices
+
+4. **Docker Audio Issues:**
+   - Use host audio devices: `--device /dev/snd`
+   - Add audio group: `--group-add audio`
+   - Check Docker audio passthrough settings
+
 ## 🚀 Quick Start
 
 ### Option 1: Docker (Recommended)
@@ -321,6 +389,9 @@ make reset-db        # Reset database
    - Check microphone permissions
    - Verify audio device selection
    - Test with: `python src/test_setup.py`
+   - Ensure default input/output devices are set correctly
+   - Check system audio settings and volume levels
+   - Verify 16kHz sample rate support
 
 3. **Docker Audio Problems**
    - Ensure audio group access: `--group-add audio`
