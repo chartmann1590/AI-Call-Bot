@@ -11,15 +11,15 @@ SAMPLE_RATE = 16000  # 16 kHz required by webrtcvad + Whisper
 FRAME_DURATION_MS = 30  # 30 ms per frame for VAD
 FRAME_SIZE = int(SAMPLE_RATE * FRAME_DURATION_MS / 1000)
 AGGRESSIVENESS = 2  # webrtcvad aggressiveness: 0–3
-AMPLITUDE_THRESHOLD = 500  # int16 max amplitude threshold
+AMPLITUDE_THRESHOLD = 100  # int16 max amplitude threshold (lowered for better detection)
 
 # Silence Detection
-SILENCE_THRESHOLD_FRAMES = 40
-MIN_UTTERANCE_FRAMES = 30
-EXTRA_FRAMES = 7
+SILENCE_THRESHOLD_FRAMES = 5  # 0.15 seconds of silence (5 frames * 30ms = 150ms)
+MIN_UTTERANCE_FRAMES = 3  # Fewer frames for faster processing (0.09 seconds minimum)
+EXTRA_FRAMES = 2  # Fewer extra frames for faster processing
 
 # Timeout Settings
-HANGUP_TIMEOUT_SECONDS = 60  # 60 seconds of silence before prompting "Are you still there?"
+HANGUP_TIMEOUT_SECONDS = 120  # 2 minutes of silence before prompting "Are you still there?"
 CONFIRM_TIMEOUT_SECONDS = 15  # After asking "Are you still there?", wait this many seconds
 
 # Ollama Configuration

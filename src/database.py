@@ -71,22 +71,35 @@ def start_new_conversation() -> int:
     """Start a new conversation and return its ID."""
     from config import OLLAMA_MODEL, TTS_VOICE, CURRENT_PERSONA_KEY
     
-    db = get_db()
+    # Create a direct database connection for starting conversations
+    db = sqlite3.connect(DATABASE_PATH)
+    db.row_factory = sqlite3.Row
+    
     cur = db.execute("""
-        INSERT INTO conversations (llm_model, tts_voice, persona_key)
-        VALUES (?, ?, ?)
+        INSERT INTO conversations (llm_model, tts_voice, persona_key, start_time)
+        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
     """, (OLLAMA_MODEL, TTS_VOICE, CURRENT_PERSONA_KEY))
     db.commit()
-    return cur.lastrowid
+    conversation_id = cur.lastrowid
+    db.close()
+    return conversation_id
 
 def insert_message(conversation_id: int, sender: str, text: str):
     """Insert a message into the database."""
-    db = get_db()
+    print(f"[DEBUG] 💾 Database: Inserting message from '{sender}' in conversation #{conversation_id}")
+    print(f"[DEBUG] 💾 Database: Message text: '{text[:50]}{'...' if len(text) > 50 else ''}'")
+    
+    # Create a direct database connection for inserting messages
+    db = sqlite3.connect(DATABASE_PATH)
+    db.row_factory = sqlite3.Row
+    
     db.execute("""
-        INSERT INTO messages (conversation_id, sender, text)
-        VALUES (?, ?, ?)
+        INSERT INTO messages (conversation_id, sender, text, timestamp)
+        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
     """, (conversation_id, sender, text))
     db.commit()
+    db.close()
+    print(f"[DEBUG] 💾 Database: Message inserted successfully")
 
 def get_conversation_text(conv_id: int) -> str:
     """Get all text from a conversation as a single string."""

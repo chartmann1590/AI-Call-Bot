@@ -5,8 +5,9 @@ Handles the main conversation loop and coordinates between audio, LLM, and TTS c
 
 import threading
 import time
+import os
 from typing import Optional
-from playsound import playsound
+import pygame
 
 from audio_processor import audio_processor
 from llm_client import query_ollama
@@ -44,9 +45,6 @@ class ConversationManager:
     
     def stop_conversation(self):
         """Stop the current conversation."""
-        self.is_active = False
-        audio_processor.stop_listening()
-        
         if self.current_conversation_id:
             # Generate summary for the conversation
             try:
@@ -56,35 +54,49 @@ class ConversationManager:
                 print(f"[ERROR] Failed to generate summary: {e}")
         
         self.current_conversation_id = None
+        
+        # Start a new conversation automatically for continuous listening
+        if self.is_active:
+            print("[INFO] Starting new conversation for continuous listening...")
+            self.start_conversation()
     
     def _audio_loop(self):
         """Main audio processing loop."""
         def on_transcription(text: str):
             """Handle transcribed text from user."""
             if not self.is_active or not text.strip():
+                print(f"[DEBUG] ⚠️ Skipping empty transcription or inactive conversation")
                 return
             
-            print(f"[USER] {text}")
+            print(f"[USER] 🗣️ '{text}'")
+            print(f"[DEBUG] 📝 Storing user message in database...")
             
             # Store user message
             if self.current_conversation_id:
                 insert_message(self.current_conversation_id, "user", text)
+                print(f"[DEBUG] ✅ User message stored in conversation #{self.current_conversation_id}")
             
             # Get AI response
+            print(f"[DEBUG] 🤖 Sending to Ollama at {os.getenv('OLLAMA_URL', 'http://74.76.44.128:11434')}...")
             try:
                 response = query_ollama(text)
-                print(f"[AI] {response}")
+                print(f"[AI] 🤖 '{response}'")
+                print(f"[DEBUG] ✅ Ollama response received")
                 
                 # Store AI response
                 if self.current_conversation_id:
+                    print(f"[DEBUG] 📝 Storing AI response in database...")
                     insert_message(self.current_conversation_id, "assistant", response)
+                    print(f"[DEBUG] ✅ AI response stored in conversation #{self.current_conversation_id}")
                 
                 # Speak the response
+                print(f"[DEBUG] 🔊 Starting TTS playback...")
                 self._speak_response(response)
                 
             except Exception as e:
-                print(f"[ERROR] Failed to get AI response: {e}")
+                print(f"[ERROR] ❌ Failed to get AI response: {e}")
                 error_msg = "I'm sorry, I'm having trouble processing your request right now."
+                print(f"[DEBUG] 🔊 Playing error message via TTS...")
                 self._speak_response(error_msg)
         
         def on_silence():
@@ -93,6 +105,9 @@ class ConversationManager:
                 # If we're waiting for confirmation and silence continues, end conversation
                 print("[INFO] No response to confirmation, ending conversation.")
                 self.stop_conversation()
+            else:
+                # Just continue listening for new speech
+                pass
         
         def on_hangup():
             """Handle hangup timeout."""
@@ -127,22 +142,36 @@ class ConversationManager:
     def _speak_response(self, text: str):
         """Speak the AI response using TTS."""
         try:
+            print(f"[DEBUG] 🔊 Setting TTS playing flag...")
             # Set TTS playing flag
             audio_processor.set_tts_playing(True)
             
             # Generate speech
+            print(f"[DEBUG] 🔊 Calling speak_text()...")
             audio_file = speak_text(text)
+            print(f"[DEBUG] 🔊 Audio file generated: {audio_file}")
             
-            # Play the audio
-            playsound(audio_file)
+            # Play the audio with pygame
+            print(f"[DEBUG] 🔊 Playing audio with pygame...")
+            pygame.mixer.init()
+            pygame.mixer.music.load(audio_file)
+            pygame.mixer.music.play()
+            
+            # Wait for playback to complete
+            while pygame.mixer.music.get_busy():
+                pygame.time.wait(100)
+            
+            print(f"[DEBUG] 🔊 Audio playback completed")
             
             # Clean up the audio file
+            print(f"[DEBUG] 🧹 Scheduling audio file cleanup...")
             cleanup_audio_file(audio_file)
             
         except Exception as e:
-            print(f"[ERROR] TTS failed: {e}")
+            print(f"[ERROR] ❌ TTS failed: {e}")
         finally:
             # Clear TTS playing flag
+            print(f"[DEBUG] 🔊 Clearing TTS playing flag...")
             audio_processor.set_tts_playing(False)
     
     def get_conversation_status(self) -> dict:

@@ -38,16 +38,23 @@ def speak_text(text: str, voice: Optional[str] = None) -> str:
     if voice is None:
         voice = TTS_VOICE
     
+    print(f"[DEBUG] 🎵 TTS: Converting '{text[:50]}{'...' if len(text) > 50 else ''}' to speech")
+    print(f"[DEBUG] 🎵 TTS: Using voice '{voice}'")
+    
     # Create a temporary file for the audio
     with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
         temp_path = tmp.name
     
+    print(f"[DEBUG] 🎵 TTS: Created temp file: {temp_path}")
+    
     try:
         # Generate the speech (blocking call via asyncio.run)
+        print(f"[DEBUG] 🎵 TTS: Generating speech with Edge TTS...")
         asyncio.run(_edge_tts_generate(text, voice, temp_path))
+        print(f"[DEBUG] 🎵 TTS: Speech generated successfully")
         return temp_path
     except Exception as e:
-        print(f"[ERROR] TTS generation failed: {e}")
+        print(f"[ERROR] ❌ TTS generation failed: {e}")
         # Clean up the temp file if it was created
         if os.path.exists(temp_path):
             os.remove(temp_path)

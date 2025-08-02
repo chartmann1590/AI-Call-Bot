@@ -35,6 +35,12 @@ def main():
     audio_processor.initialize_whisper()
     print("[INFO] Audio processor initialized.")
     
+    # Start voice conversation system automatically
+    print("[INFO] Starting voice conversation system...")
+    conversation_manager.start_conversation()
+    print("[INFO] Voice conversation system active - listening for voice input!")
+    print("[INFO] Speak to start a conversation with the AI.")
+    
     # Start the Flask application
     print(f"[INFO] Starting Flask server on {FLASK_HOST}:{FLASK_PORT}")
     print(f"[INFO] Debug mode: {FLASK_DEBUG}")

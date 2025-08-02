@@ -22,8 +22,12 @@ def query_ollama(user_text: str, persona_key: Optional[str] = None) -> str:
     if persona_key is None:
         persona_key = CURRENT_PERSONA_KEY
     
+    print(f"[DEBUG] 🤖 Ollama: Querying with persona '{persona_key}'")
+    print(f"[DEBUG] 🤖 Ollama: User text: '{user_text[:50]}{'...' if len(user_text) > 50 else ''}'")
+    
     # Get the persona system instruction
     system_instruction = PERSONAS.get(persona_key, PERSONAS["helpful"])
+    print(f"[DEBUG] 🤖 Ollama: Using system instruction (length: {len(system_instruction)} chars)")
     
     # Prepare the request payload
     payload = {
@@ -41,31 +45,39 @@ def query_ollama(user_text: str, persona_key: Optional[str] = None) -> str:
         "stream": False
     }
     
+    print(f"[DEBUG] 🤖 Ollama: Sending request to {OLLAMA_URL}/api/chat")
+    print(f"[DEBUG] 🤖 Ollama: Model: {OLLAMA_MODEL}")
+    
     try:
         # Make the request to Ollama
+        print(f"[DEBUG] 🤖 Ollama: Making POST request...")
         response = requests.post(
             f"{OLLAMA_URL}/api/chat",
             json=payload,
             timeout=120
         )
+        print(f"[DEBUG] 🤖 Ollama: Response status: {response.status_code}")
         response.raise_for_status()
         
         # Parse the response
+        print(f"[DEBUG] 🤖 Ollama: Parsing JSON response...")
         data = response.json()
         if "message" in data and "content" in data["message"]:
-            return data["message"]["content"].strip()
+            response_text = data["message"]["content"].strip()
+            print(f"[DEBUG] 🤖 Ollama: Response received (length: {len(response_text)} chars)")
+            return response_text
         else:
-            print(f"[ERROR] Unexpected Ollama response format: {data}")
+            print(f"[ERROR] ❌ Unexpected Ollama response format: {data}")
             return "I'm sorry, I couldn't process that request."
             
     except requests.exceptions.RequestException as e:
-        print(f"[ERROR] Ollama request failed: {e}")
+        print(f"[ERROR] ❌ Ollama request failed: {e}")
         return "I'm sorry, I'm having trouble connecting to my language model right now."
     except json.JSONDecodeError as e:
-        print(f"[ERROR] Failed to parse Ollama response: {e}")
+        print(f"[ERROR] ❌ Failed to parse Ollama response: {e}")
         return "I'm sorry, I received an invalid response from my language model."
     except Exception as e:
-        print(f"[ERROR] Unexpected error in Ollama query: {e}")
+        print(f"[ERROR] ❌ Unexpected error in Ollama query: {e}")
         return "I'm sorry, something unexpected happened while processing your request."
 
 def get_available_models() -> list:
