@@ -77,7 +77,7 @@ class ConversationManager:
                 print(f"[DEBUG] ✅ User message stored in conversation #{self.current_conversation_id}")
             
             # Get AI response
-            print(f"[DEBUG] 🤖 Sending to Ollama at {os.getenv('OLLAMA_URL', 'http://74.76.44.128:11434')}...")
+            print(f"[DEBUG] 🤖 Sending to Ollama at {os.getenv('OLLAMA_URL', 'http://localhost:11434')}...")
             try:
                 response = query_ollama(text)
                 print(f"[AI] 🤖 '{response}'")

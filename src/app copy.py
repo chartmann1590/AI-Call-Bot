@@ -33,7 +33,7 @@ AGGRESSIVENESS         = 2            # webrtcvad aggressiveness: 0–3
 AMPLITUDE_THRESHOLD    = 500          # int16 max amplitude threshold
 
 # 3. Ollama HTTP endpoint (default; can be changed via /settings)
-OLLAMA_URL             = "http://74.76.44.128:11434"
+OLLAMA_URL             = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL           = "llama3.2"   # default model if none selected
 
 # 4. Silence detection: how many consecutive silent frames end an utterance

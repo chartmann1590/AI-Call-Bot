@@ -173,4 +173,8 @@ credentials.json
 temp_audio_*.mp3
 temp_audio_*.wav
 *.wav
-*.mp3 
+*.mp3
+
+# OAuth and MCP tools (contain sensitive configuration)
+src/mcp_tools.py
+src/oauth_setup.py 

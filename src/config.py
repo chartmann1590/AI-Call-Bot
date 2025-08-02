@@ -23,7 +23,7 @@ HANGUP_TIMEOUT_SECONDS = 120  # 2 minutes of silence before prompting "Are you s
 CONFIRM_TIMEOUT_SECONDS = 15  # After asking "Are you still there?", wait this many seconds
 
 # Ollama Configuration
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://74.76.44.128:11434")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 # TTS Configuration
