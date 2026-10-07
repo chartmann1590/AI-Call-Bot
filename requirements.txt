@@ -24,4 +24,4 @@ psutil==5.9.6
 
 # API and serialization (Phase 1)
 flask-restful==0.3.10
-flask-cors==4.0.0 
+flask-cors==6.0.0 
