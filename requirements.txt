@@ -17,7 +17,7 @@ python-dotenv==1.0.0
 # Security enhancements (Phase 1)
 PyJWT==2.15.0
 bcrypt==4.1.2
-cryptography==41.0.7
+cryptography==50.0.0
 
 # Monitoring and logging (Phase 1)
 psutil==5.9.6
